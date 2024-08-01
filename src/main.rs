@@ -108,12 +108,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut rl = DefaultEditor::new()?;
     let config = Config::get().await?;
 
-    let link = "";
+    loop {
+        let link = rl.readline("Invite-Link: ")?.replace("https://discord.gg/", "").replace("https://discord.com/invite/", "");
+        println!();
 
 
-    let invite_data = InviteData::get(&config.token, &link).await?;
-    println!("{:#?}", invite_data);
+        let invite_data = InviteData::get(&config.token, &link).await?;
+        println!("{:#?}", invite_data);
 
-    println!();
+
+        println!();
+    }
     Ok(())
 }
