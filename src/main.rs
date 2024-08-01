@@ -103,16 +103,6 @@ impl InviteData {
     }
 }
 
-impl Config {
-    async fn get() -> Result<Config, Box<dyn std::error::Error>> {
-        let mut file = File::open("config.json").await?;
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).await?;
-        let config: Config = serde_json::from_str(&contents)?;
-        Ok(config)
-    }
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut rl = DefaultEditor::new()?;
