@@ -9,34 +9,26 @@ struct Config {
     token: String,
 }
 
+impl Config {
+    async fn get() -> Result<Config, Box<dyn std::error::Error>> {
+        let mut file = File::open("config.json").await?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).await?;
+        let config: Config = serde_json::from_str(&contents)?;
+        Ok(config)
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
-struct Channel {
-    pub id: String,
+struct InviteData {
     pub r#type: i64,
-    pub name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Guild {
-    pub id: String,
-    pub name: String,
-    pub splash: Option<String>,
-    pub banner: Option<String>,
-    pub description: Option<String>,
-    pub icon: Option<String>,
-    pub features: Vec<String>,
-    pub verification_level: i64,
-    pub vanity_url_code: Option<String>,
-    pub nsfw_level: i64,
-    pub nsfw: bool,
-    pub premium_subscription_count: i64,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct AvatarDecorationData {
-    pub asset: String,
-    pub sku_id: String,
+    pub code: String,
+    pub inviter: Inviter,
     pub expires_at: Option<String>,
+    pub flags: i64,
+    pub guild: Guild,
+    pub guild_id: String,
+    pub channel: Channel,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -57,6 +49,13 @@ struct Inviter {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+struct AvatarDecorationData {
+    pub asset: String,
+    pub sku_id: String,
+    pub expires_at: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 struct Clan {
     pub identity_guild_id: String,
     pub identity_enabled: bool,
@@ -65,15 +64,26 @@ struct Clan {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct InviteData {
+struct Guild {
+    pub id: String,
+    pub name: String,
+    pub splash: Option<String>,
+    pub banner: Option<String>,
+    pub description: Option<String>,
+    pub icon: Option<String>,
+    pub features: Vec<String>,
+    pub verification_level: i64,
+    pub vanity_url_code: Option<String>,
+    pub nsfw_level: i64,
+    pub nsfw: bool,
+    pub premium_subscription_count: i64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Channel {
+    pub id: String,
     pub r#type: i64,
-    pub code: String,
-    pub inviter: Inviter,
-    pub expires_at: Option<String>,
-    pub flags: i64,
-    pub guild: Guild,
-    pub guild_id: String,
-    pub channel: Channel,
+    pub name: String,
 }
 
 impl InviteData {
