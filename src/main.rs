@@ -109,41 +109,6 @@ impl InviteData {
         };
         Ok(invite_type.to_string())
     }
-    async fn inviter_id_to_link(&self, img_type: ImageType) -> Result<Option<String>, Box<dyn std::error::Error>> {
-        if self.inviter.is_none() {
-            return Ok(None);
-        }
-        let inviter = self.inviter.clone().unwrap();
-        let img_id;
-        if img_type == ImageType::Avatar && inviter.avatar.is_none() {
-            return Ok(Some("https://cdn.discordapp.com/embed/avatars/0.png".to_string()));
-        } else if img_type == ImageType::Banner && inviter.banner.is_none() {
-            return Ok(Some("None".to_string()));
-        } else {
-            img_id = match img_type {
-                ImageType::Avatar => inviter.avatar.clone().unwrap(),
-                ImageType::Banner => inviter.banner.clone().unwrap(),
-                ImageType::AvatarDecoration => inviter.avatar_decoration_data.clone().unwrap().asset,
-            };
-        }
-        let mut url = String::new();
-        if img_type == ImageType::Avatar || img_type == ImageType::Banner {
-            url = format!("https://cdn.discordapp.com/{}/{}/{}", &img_type, inviter.id, img_id)
-        } else if img_type == ImageType::AvatarDecoration {
-            return Ok(Some(format!("https://cdn.discordapp.com/{}/{}.png?size=4096", &img_type, img_id)));
-        }
-
-        url.push_str(".gif");
-        let response = reqwest::get(&url).await?;
-        return if response.status().is_success() {
-            url.push_str("?size=4096");
-            Ok(Some(url))
-        } else {
-            url.truncate(url.len() - 4);
-            url.push_str(".png?size=4096");
-            Ok(Some(url))
-        };
-    }
     async fn check_flags(&self) -> Option<Vec<String>> {
         if self.inviter.is_none() {
             return None;
