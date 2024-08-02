@@ -274,13 +274,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let invite_data = InviteData::get(&config.token, &link).await?;
 
-        let (invite_type, avatar, banner, asset, badge, channel_type) = join!(
+        let (invite_type, avatar, banner, asset, badge, channel_type, guild_splash, guild_banner, guild_icon) = join!(
             invite_data.get_invite_type(),
             invite_data.inviter_id_to_link(InviterImageType::Avatar),
             invite_data.inviter_id_to_link(InviterImageType::Banner),
             invite_data.inviter_id_to_link(InviterImageType::AvatarDecoration),
             invite_data.check_flags(),
-            invite_data.get_channel_type()
+            invite_data.get_channel_type(),
+            invite_data.guild.guild_id_to_link(GuildImageType::Splash),
+            invite_data.guild.guild_id_to_link(GuildImageType::Banner),
+            invite_data.guild.guild_id_to_link(GuildImageType::Icon)
         );
 
 
@@ -348,10 +351,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Guild:");
         println!(" - ID: {}", invite_data.guild.id);
         println!(" - Name: {}", invite_data.guild.name);
-        println!(" - Splash: {}", invite_data.guild.splash.unwrap_or("None".to_string()));
-        println!(" - Banner: {}", invite_data.guild.banner.unwrap_or("None".to_string()));
+        println!(" - Splash: {}", guild_splash?.unwrap_or("None".to_string()));
+        println!(" - Banner: {}", guild_banner?.unwrap_or("None".to_string()));
         println!(" - Description: {}", invite_data.guild.description.unwrap_or("None".to_string()));
-        println!(" - Icon: {}", invite_data.guild.icon.unwrap_or("None".to_string()));
+        println!(" - Icon: {}", guild_icon?.unwrap_or("None".to_string()));
         if !invite_data.guild.features.is_empty() {
             println!(" - Features:");
             for feature in &invite_data.guild.features {
