@@ -98,7 +98,6 @@ impl InviteData {
             .headers(header)
             .send().await?;
         let body = res.text().await?;
-        dbg!(&body);
         let data: InviteData = serde_json::from_str(&body)?;
         Ok(data)
     }
