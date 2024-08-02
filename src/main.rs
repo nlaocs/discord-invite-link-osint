@@ -111,6 +111,14 @@ impl InviteData {
         Ok(invite_type.to_string())
     }
 }
+
+#[derive(Eq, PartialEq)]
+enum ImageType {
+    Avatar,
+    Banner,
+    AvatarDecoration,
+}
+
 }
 
 #[tokio::main]
