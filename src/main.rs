@@ -31,7 +31,7 @@ struct InviteData {
     pub channel: Channel,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct Inviter {
     pub id: String,
     pub username: String,
@@ -49,13 +49,14 @@ struct Inviter {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct AvatarDecorationData {
     pub asset: String,
     pub sku_id: String,
     pub expires_at: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct Clan {
     pub identity_guild_id: String,
     pub identity_enabled: bool,
