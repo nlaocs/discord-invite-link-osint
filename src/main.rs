@@ -101,6 +101,16 @@ impl InviteData {
         let data: InviteData = serde_json::from_str(&body)?;
         Ok(data)
     }
+    async fn get_invite_type(&self) -> Result<String, Box<dyn std::error::Error>> {
+        let invite_type = match self.r#type {
+            0 => "Guild Invite",
+            1 => "Group DM Invite",
+            2 => "Friend Invite",
+            _ => "Unknown Invite",
+        };
+        Ok(invite_type.to_string())
+    }
+}
 }
 
 #[tokio::main]
