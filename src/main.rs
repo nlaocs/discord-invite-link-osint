@@ -109,29 +109,29 @@ impl InviteData {
         };
         Ok(invite_type.to_string())
     }
-    async fn inviter_id_to_link(&self, img_type: ImageType) -> Result<Option<String>, Box<dyn std::error::Error>> {
+    async fn inviter_id_to_link(&self, img_type: InviterImageType) -> Result<Option<String>, Box<dyn std::error::Error>> {
         if self.inviter.is_none() {
             return Ok(None);
         }
         let inviter = self.inviter.clone().unwrap();
         let img_id;
-        if img_type == ImageType::Avatar && inviter.avatar.is_none() {
+        if img_type == InviterImageType::Avatar && inviter.avatar.is_none() {
             return Ok(Some("https://cdn.discordapp.com/embed/avatars/0.png".to_string()));
-        } else if img_type == ImageType::Banner && inviter.banner.is_none() {
+        } else if img_type == InviterImageType::Banner && inviter.banner.is_none() {
             return Ok(Some("None".to_string()));
-        } else if img_type == ImageType::AvatarDecoration && inviter.avatar_decoration_data.is_none() {
+        } else if img_type == InviterImageType::AvatarDecoration && inviter.avatar_decoration_data.is_none() {
             return Ok(Some("None".to_string()));
         } else {
             img_id = match img_type {
-                ImageType::Avatar => inviter.avatar.clone().unwrap(),
-                ImageType::Banner => inviter.banner.clone().unwrap(),
-                ImageType::AvatarDecoration => inviter.avatar_decoration_data.clone().unwrap().asset,
+                InviterImageType::Avatar => inviter.avatar.clone().unwrap(),
+                InviterImageType::Banner => inviter.banner.clone().unwrap(),
+                InviterImageType::AvatarDecoration => inviter.avatar_decoration_data.clone().unwrap().asset,
             };
         }
         let mut url = String::new();
-        if img_type == ImageType::Avatar || img_type == ImageType::Banner {
+        if img_type == InviterImageType::Avatar || img_type == InviterImageType::Banner {
             url = format!("https://cdn.discordapp.com/{}/{}/{}", &img_type, inviter.id, img_id)
-        } else if img_type == ImageType::AvatarDecoration {
+        } else if img_type == InviterImageType::AvatarDecoration {
             return Ok(Some(format!("https://cdn.discordapp.com/{}/{}.png?size=4096", &img_type, img_id)));
         }
 
@@ -205,18 +205,18 @@ impl InviteData {
 }
 
 #[derive(Eq, PartialEq)]
-enum ImageType {
+enum InviterImageType {
     Avatar,
     Banner,
     AvatarDecoration,
 }
 
-impl std::fmt::Display for ImageType {
+impl std::fmt::Display for InviterImageType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            ImageType::Avatar => write!(f, "avatars"),
-            ImageType::Banner => write!(f, "banners"),
-            ImageType::AvatarDecoration => write!(f, "avatar-decoration-presets"),
+            InviterImageType::Avatar => write!(f, "avatars"),
+            InviterImageType::Banner => write!(f, "banners"),
+            InviterImageType::AvatarDecoration => write!(f, "avatar-decoration-presets"),
         }
     }
 }
@@ -235,9 +235,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let (invite_type, avatar, banner, asset, badge, channel_type) = join!(
             invite_data.get_invite_type(),
-            invite_data.inviter_id_to_link(ImageType::Avatar),
-            invite_data.inviter_id_to_link(ImageType::Banner),
-            invite_data.inviter_id_to_link(ImageType::AvatarDecoration),
+            invite_data.inviter_id_to_link(InviterImageType::Avatar),
+            invite_data.inviter_id_to_link(InviterImageType::Banner),
+            invite_data.inviter_id_to_link(InviterImageType::AvatarDecoration),
             invite_data.check_flags(),
             invite_data.get_channel_type()
         );
