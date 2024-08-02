@@ -23,7 +23,7 @@ impl Config {
 struct InviteData {
     pub r#type: i64,
     pub code: String,
-    pub inviter: Inviter,
+    pub inviter: Option<Inviter>,
     pub expires_at: Option<String>,
     pub flags: i64,
     pub guild: Guild,
