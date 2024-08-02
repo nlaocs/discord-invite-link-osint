@@ -234,7 +234,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Inviter:");
             println!(" - ID: {}", inviter_data.id);
             println!(" - Username: {}", inviter_data.username);
-            println!(" - Avatar: {}", avatar?);
+            println!(" - Avatar: {}", avatar?.unwrap_or("None".to_string()));
             println!(" - Discriminator: {}", inviter_data.discriminator);
             println!(" - Public Flags: {}", inviter_data.public_flags);
             if badge.is_some() {
@@ -246,7 +246,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!(" - Badge: None");
             }
             println!(" - Flags: {}", inviter_data.flags);
-            println!(" - Banner: {}", banner?);
+            println!(" - Banner: {}", banner?.unwrap_or("None".to_string()));
             println!(" - Bot: {}", inviter_data.bot.unwrap_or(false));
             println!(" - Banner: {}", inviter_data.banner.unwrap_or("None".to_string()));
             if inviter_data.accent_color.is_some() {
@@ -258,7 +258,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if inviter_data.avatar_decoration_data.is_some() {
                 let avatar_decoration_data = inviter_data.avatar_decoration_data.clone().unwrap();
                 println!(" - Avatar Decoration Data:");
-                println!(" -  - Asset: {}", asset?);
+                println!(" -  - Asset: {}", asset?.unwrap_or("None".to_string()));
                 println!(" -  - SKU ID: {}", avatar_decoration_data.sku_id);
                 if avatar_decoration_data.expires_at.is_some() {
                     println!(" -  - Expires at: {}", avatar_decoration_data.expires_at.unwrap());
