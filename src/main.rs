@@ -119,6 +119,14 @@ enum ImageType {
     AvatarDecoration,
 }
 
+impl std::fmt::Display for ImageType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            ImageType::Avatar => write!(f, "avatars"),
+            ImageType::Banner => write!(f, "banners"),
+            ImageType::AvatarDecoration => write!(f, "avatar-decoration-presets"),
+        }
+    }
 }
 
 #[tokio::main]
