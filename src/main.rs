@@ -233,12 +233,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let invite_data = InviteData::get(&config.token, &link).await?;
 
-        let (invite_type, avatar, banner, asset, badge) = join!(
+        let (invite_type, avatar, banner, asset, badge, channel_type) = join!(
             invite_data.get_invite_type(),
             invite_data.inviter_id_to_link(ImageType::Avatar),
             invite_data.inviter_id_to_link(ImageType::Banner),
             invite_data.inviter_id_to_link(ImageType::AvatarDecoration),
-            invite_data.check_flags()
+            invite_data.check_flags(),
+            invite_data.get_channel_type()
         );
 
 
@@ -326,7 +327,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         println!("Channel:");
         println!(" - ID: {}", invite_data.channel.id);
-        println!(" - Type: {}", invite_data.channel.r#type);
+        println!(" - Type ID: {}", invite_data.channel.r#type);
+        println!(" - Type: {}", channel_type?);
         println!(" - Name: {}", invite_data.channel.name);
 
         println!();
