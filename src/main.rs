@@ -221,6 +221,23 @@ impl std::fmt::Display for InviterImageType {
     }
 }
 
+#[derive(Eq, PartialEq)]
+enum GuildImageType {
+    Splash,
+    Banner,
+    Icon,
+}
+
+impl std::fmt::Display for GuildImageType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            GuildImageType::Splash => write!(f, "splashes"),
+            GuildImageType::Banner => write!(f, "banners"),
+            GuildImageType::Icon => write!(f, "icons"),
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut rl = DefaultEditor::new()?;
