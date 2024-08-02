@@ -290,7 +290,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!(" - Banner: {}", invite_data.guild.banner.unwrap_or("None".to_string()));
         println!(" - Description: {}", invite_data.guild.description.unwrap_or("None".to_string()));
         println!(" - Icon: {}", invite_data.guild.icon.unwrap_or("None".to_string()));
-        println!(" - Features:"); // todo
+        if !invite_data.guild.features.is_empty() {
+            println!(" - Features:");
+            for feature in &invite_data.guild.features {
+                println!(" -  - {}", feature);
+            }
+        } else {
+            println!(" - Features: None");
+        }
         println!(" - Verification Level: {}", invite_data.guild.verification_level);
         println!(" - Vanity URL Code: {}", invite_data.guild.vanity_url_code.unwrap_or("None".to_string()));
         println!(" - NSFW Level: {}", invite_data.guild.nsfw_level);
