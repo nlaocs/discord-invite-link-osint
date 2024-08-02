@@ -202,8 +202,92 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 
         let invite_data = InviteData::get(&config.token, &link).await?;
-        println!("{:#?}", invite_data);
 
+        let (invite_type, avatar, banner, asset) = join!(
+            invite_data.get_invite_type(),
+            invite_data.inviter.id_to_link(ImageType::Avatar),
+            invite_data.inviter.id_to_link(ImageType::Banner),
+            invite_data.inviter.id_to_link(ImageType::AvatarDecoration));
+
+        println!("Invite:");
+        println!(" - Type: {}", invite_type?);
+        println!(" - Code: {}", link);
+        println!(" - Expires at: {}", invite_data.expires_at.unwrap_or("Life Time".to_string()));
+        println!(" - Flags: {}", invite_data.flags);
+        println!(" - Guild ID: {}", invite_data.guild_id);
+
+        if invite_data.inviter.is_some() {
+            let inviter_data = invite_data.inviter.clone().unwrap();
+            println!("Inviter:");
+            println!(" - ID: {}", inviter_data.id);
+            println!(" - Username: {}", inviter_data.username);
+            println!(" - Avatar: {}", avatar?);
+            println!(" - Discriminator: {}", inviter_data.discriminator);
+            println!(" - Public Flags: {}", inviter_data.public_flags);
+            if inviter_data.public_flags != 0 {
+                println!(" - Badge:");
+                for flag in inviter_data.check_flags() {
+                    println!(" -  - {}", flag);
+                }
+            } else {
+                println!(" - Badge: None");
+            }
+            println!(" - Flags: {}", inviter_data.flags);
+            println!(" - Banner: {}", banner?);
+            println!(" - Bot: {}", inviter_data.bot.unwrap_or(false));
+            println!(" - Banner: {}", inviter_data.banner.unwrap_or("None".to_string()));
+            if inviter_data.accent_color.is_some() {
+                println!(" - Accent Color: {}", format!("#{:06x}", inviter_data.accent_color.unwrap()));
+            } else {
+                println!(" - Accent Color: None");
+            }
+            println!(" - Global Name: {}", inviter_data.global_name.unwrap_or("None".to_string()));
+            if inviter_data.avatar_decoration_data.is_some() {
+                let avatar_decoration_data = inviter_data.avatar_decoration_data.clone().unwrap();
+                println!(" - Avatar Decoration Data:");
+                println!(" -  - Asset: {}", asset?);
+                println!(" -  - SKU ID: {}", avatar_decoration_data.sku_id);
+                if avatar_decoration_data.expires_at.is_some() {
+                    println!(" -  - Expires at: {}", avatar_decoration_data.expires_at.unwrap());
+                } else {
+                    println!(" -  - Expires at: None");
+                }
+            } else {
+                println!(" - Avatar Decoration Data: None");
+            }
+            println!(" - Banner Color: {}", inviter_data.banner_color.unwrap_or("None".to_string()));
+            if inviter_data.clan.is_some() {
+                let clan = inviter_data.clan.clone().unwrap();
+                println!(" - Clan:");
+                println!(" -  - Identity Guild Id: {}", clan.identity_guild_id);
+                println!(" -  - Identity Enabled: {}", clan.identity_enabled);
+                println!(" -  - Tag: {}", clan.tag);
+                println!(" -  - Badge: {}", clan.badge);
+            } else {
+                println!(" - Clan: None");
+            }
+        } else {
+            println!("Inviter: None");
+        }
+
+        println!("Guild:");
+        println!(" - ID: {}", invite_data.guild.id);
+        println!(" - Name: {}", invite_data.guild.name);
+        println!(" - Splash: {}", invite_data.guild.splash.unwrap_or("None".to_string()));
+        println!(" - Banner: {}", invite_data.guild.banner.unwrap_or("None".to_string()));
+        println!(" - Description: {}", invite_data.guild.description.unwrap_or("None".to_string()));
+        println!(" - Icon: {}", invite_data.guild.icon.unwrap_or("None".to_string()));
+        println!(" - Features:"); // todo
+        println!(" - Verification Level: {}", invite_data.guild.verification_level);
+        println!(" - Vanity URL Code: {}", invite_data.guild.vanity_url_code.unwrap_or("None".to_string()));
+        println!(" - NSFW Level: {}", invite_data.guild.nsfw_level);
+        println!(" - NSFW: {}", invite_data.guild.nsfw);
+        println!(" - Premium Subscription Count: {}", invite_data.guild.premium_subscription_count);
+
+        println!("Channel:");
+        println!(" - ID: {}", invite_data.channel.id);
+        println!(" - Type: {}", invite_data.channel.r#type);
+        println!(" - Name: {}", invite_data.channel.name);
 
         println!();
     }
