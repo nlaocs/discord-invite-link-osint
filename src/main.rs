@@ -81,25 +81,21 @@ struct Guild {
 
 impl Guild {
     async fn guild_id_to_link(&self, img_type: GuildImageType) -> Result<Option<String>, Box<dyn std::error::Error>> {
-        let img_id;
-        if img_type == GuildImageType::Splash && self.splash.is_none() {
+        if img_type == GuildImageType::Splash && self.splash.is_none() || img_type == GuildImageType::Banner && self.banner.is_none() {
             return Ok(Some("None".to_string()));
-        } else if img_type == GuildImageType::Banner && self.banner.is_none() {
-            return Ok(Some("None".to_string()));
-        } else {
-            img_id = match img_type {
-                GuildImageType::Splash => self.splash.clone().unwrap(),
-                GuildImageType::Banner => self.banner.clone().unwrap(),
-                GuildImageType::Icon => self.icon.clone().unwrap(),
-            };
         }
+        let img_id = match img_type {
+            GuildImageType::Splash => self.splash.clone().unwrap(),
+            GuildImageType::Banner => self.banner.clone().unwrap(),
+            GuildImageType::Icon => self.icon.clone().unwrap(),
+        };
         let url = format!("https://cdn.discordapp.com/{}/{}/{}.png?size=4096", &img_type, self.id, img_id);
         let response = reqwest::get(&url).await?;
-        return if response.status().is_success() {
+        if response.status().is_success() {
             Ok(Some(url))
         } else {
             Ok(Some(url.replace(".png", ".gif")))
-        };
+        }
     }
 }
 
@@ -141,9 +137,7 @@ impl InviteData {
         let img_id;
         if img_type == InviterImageType::Avatar && inviter.avatar.is_none() {
             return Ok(Some("https://cdn.discordapp.com/embed/avatars/0.png".to_string()));
-        } else if img_type == InviterImageType::Banner && inviter.banner.is_none() {
-            return Ok(Some("None".to_string()));
-        } else if img_type == InviterImageType::AvatarDecoration && inviter.avatar_decoration_data.is_none() {
+        } else if img_type == InviterImageType::Banner && inviter.banner.is_none() || img_type == InviterImageType::AvatarDecoration && inviter.avatar_decoration_data.is_none() {
             return Ok(Some("None".to_string()));
         } else {
             img_id = match img_type {
@@ -161,19 +155,17 @@ impl InviteData {
 
         url.push_str(".gif");
         let response = reqwest::get(&url).await?;
-        return if response.status().is_success() {
+        if response.status().is_success() {
             url.push_str("?size=4096");
             Ok(Some(url))
         } else {
             url.truncate(url.len() - 4);
             url.push_str(".png?size=4096");
             Ok(Some(url))
-        };
+        }
     }
     async fn check_flags(&self) -> Option<Vec<String>> {
-        if self.inviter.is_none() {
-            return None;
-        }
+        self.inviter.as_ref()?;
         let inviter = self.inviter.clone().unwrap();
         if inviter.public_flags == 0 {
             return None;
@@ -205,7 +197,7 @@ impl InviteData {
                 }
             })
             .collect();
-        return Some(badge);
+        Some(badge)
     }
     async fn get_channel_type(&self) -> Result<String, Box<dyn std::error::Error>> {
         let channel_type = match self.channel.r#type {
@@ -315,7 +307,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!(" - Bot: {}", inviter_data.bot.unwrap_or(false));
             println!(" - Banner: {}", inviter_data.banner.unwrap_or("None".to_string()));
             if inviter_data.accent_color.is_some() {
-                println!(" - Accent Color: {}", format!("#{:06x}", inviter_data.accent_color.unwrap()));
+                println!(" - Accent Color: {:06x}", inviter_data.accent_color.unwrap());
             } else {
                 println!(" - Accent Color: None");
             }
