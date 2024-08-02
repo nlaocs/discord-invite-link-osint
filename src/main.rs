@@ -212,11 +212,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let invite_data = InviteData::get(&config.token, &link).await?;
 
-        let (invite_type, avatar, banner, asset) = join!(
+
+        let (invite_type, avatar, banner, asset, badge) = join!(
             invite_data.get_invite_type(),
-            invite_data.inviter.id_to_link(ImageType::Avatar),
-            invite_data.inviter.id_to_link(ImageType::Banner),
-            invite_data.inviter.id_to_link(ImageType::AvatarDecoration));
+            invite_data.inviter_id_to_link(ImageType::Avatar),
+            invite_data.inviter_id_to_link(ImageType::Banner),
+            invite_data.inviter_id_to_link(ImageType::AvatarDecoration),
+            invite_data.check_flags()
+        );
+
 
         println!("Invite:");
         println!(" - Type: {}", invite_type?);
@@ -233,9 +237,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!(" - Avatar: {}", avatar?);
             println!(" - Discriminator: {}", inviter_data.discriminator);
             println!(" - Public Flags: {}", inviter_data.public_flags);
-            if inviter_data.public_flags != 0 {
+            if badge.is_some() {
                 println!(" - Badge:");
-                for flag in inviter_data.check_flags() {
+                for flag in badge.unwrap() {
                     println!(" -  - {}", flag);
                 }
             } else {
