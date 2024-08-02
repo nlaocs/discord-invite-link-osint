@@ -183,6 +183,25 @@ impl InviteData {
             .collect();
         return Some(badge);
     }
+    async fn get_channel_type(&self) -> Result<String, Box<dyn std::error::Error>> {
+        let channel_type = match self.channel.r#type {
+            0 => "Guild Text",
+            1 => "DM",
+            2 => "Guild Voice",
+            3 => "Group DM",
+            4 => "Guild Category",
+            5 => "Guild Announcement",
+            10 => "Announcement Thread",
+            11 => "Public Thread",
+            12 => "Private Thread",
+            13 => "Guild Stage Voice",
+            14 => "Guild Directory",
+            15 => "Guild Forum",
+            16 => "Guild Media",
+            _ => "Unknown Channel",
+        };
+        Ok(channel_type.to_string())
+    }
 }
 
 #[derive(Eq, PartialEq)]
