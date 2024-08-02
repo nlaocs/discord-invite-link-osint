@@ -79,6 +79,30 @@ struct Guild {
     pub premium_subscription_count: i64,
 }
 
+impl Guild {
+    async fn guild_id_to_link(&self, img_type: GuildImageType) -> Result<Option<String>, Box<dyn std::error::Error>> {
+        let img_id;
+        if img_type == GuildImageType::Splash && self.splash.is_none() {
+            return Ok(Some("None".to_string()));
+        } else if img_type == GuildImageType::Banner && self.banner.is_none() {
+            return Ok(Some("None".to_string()));
+        } else {
+            img_id = match img_type {
+                GuildImageType::Splash => self.splash.clone().unwrap(),
+                GuildImageType::Banner => self.banner.clone().unwrap(),
+                GuildImageType::Icon => self.icon.clone().unwrap(),
+            };
+        }
+        let url = format!("https://cdn.discordapp.com/{}/{}/{}.png?size=4096", &img_type, self.id, img_id);
+        let response = reqwest::get(&url).await?;
+        return if response.status().is_success() {
+            Ok(Some(url))
+        } else {
+            Ok(Some(url.replace(".png", ".gif")))
+        };
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct Channel {
     pub id: String,
