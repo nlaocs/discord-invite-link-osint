@@ -48,7 +48,69 @@ struct Inviter {
     pub clan: Option<Clan>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+impl Inviter {
+    async fn id_to_link(&self, img_type: ImageType) -> Result<String, Box<dyn std::error::Error>> {
+        let img_id;
+        if img_type == ImageType::Avatar && self.avatar.is_none() {
+            return Ok("https://cdn.discordapp.com/embed/avatars/0.png".to_string());
+        } else if img_type == ImageType::Banner && self.banner.is_none() {
+            return Ok("None".to_string());
+        } else {
+            img_id = match img_type {
+                ImageType::Avatar => self.avatar.clone().unwrap(),
+                ImageType::Banner => self.banner.clone().unwrap(),
+                ImageType::AvatarDecoration => self.avatar_decoration_data.clone().unwrap().asset,
+            };
+        }
+        let mut url = String::new();
+        if img_type == ImageType::Avatar || img_type == ImageType::Banner {
+            url = format!("https://cdn.discordapp.com/{}/{}/{}", &img_type, self.id, img_id)
+        } else if img_type == ImageType::AvatarDecoration {
+            return Ok(format!("https://cdn.discordapp.com/{}/{}.png?size=4096", &img_type, img_id));
+        }
+
+        url.push_str(".gif");
+        let response = reqwest::get(&url).await?;
+        return if response.status().is_success() {
+            url.push_str("?size=4096");
+            Ok(url)
+        } else {
+            url.truncate(url.len() - 4);
+            url.push_str(".png?size=4096");
+            Ok(url)
+        };
+    }
+    fn check_flags(&self) -> Vec<String> {
+        const FLAGS: &[(&str, u64)] = &[
+            ("Staff", 1),
+            ("Partnered Server Owner", 2),
+            ("HypeSquad Events", 4),
+            ("Bug Hunter Level 1", 8),
+            ("HypeSquad Bravery", 64),
+            ("HypeSquad Brilliance", 128),
+            ("HypeSquad Balance", 256),
+            ("Premium Early Supporter", 512),
+            ("Team Pseudo User", 1024),
+            ("Bug Hunter Level 2", 16384),
+            ("Verified Bot", 65536),
+            ("Verified Developer", 131072),
+            ("Certified Moderator", 262144),
+            ("Bot Http Interactions", 524288),
+            ("Active Developer", 4194304)
+        ];
+
+        FLAGS.iter()
+            .filter_map(|&(flag_name, flag_value)| {
+                if &self.public_flags & flag_value == flag_value {
+                    Some(flag_name.to_string())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct AvatarDecorationData {
     pub asset: String,
