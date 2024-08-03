@@ -29,6 +29,8 @@ struct InviteData {
     pub guild: Guild,
     pub guild_id: String,
     pub channel: Channel,
+    pub approximate_member_count: i64,
+    pub approximate_presence_count: i64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -113,7 +115,7 @@ impl InviteData {
         header.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         let auth_value = format!("Bot {}", token);
         header.insert(AUTHORIZATION, HeaderValue::from_str(&auth_value)?);
-        let res = client.get(&format!("https://discord.com/api/v10/invites/{}", link))
+        let res = client.get(&format!("https://discord.com/api/v10/invites/{}?with_counts=true", link))
             .headers(header)
             .send().await?;
         let body = res.text().await?;
@@ -284,6 +286,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!(" - Code: {}", link);
         println!(" - Expires at: {}", invite_data.expires_at.unwrap_or("Life Time".to_string()));
         println!(" - Flags: {}", invite_data.flags);
+        println!(" - Member Count: {}", invite_data.approximate_member_count);
+        println!(" - Online Member Count: {}", invite_data.approximate_presence_count);
         println!(" - Guild ID: {}", invite_data.guild_id);
 
         if invite_data.inviter.is_some() {
