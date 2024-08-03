@@ -81,7 +81,7 @@ struct Guild {
 
 impl Guild {
     async fn guild_id_to_link(&self, img_type: GuildImageType) -> Result<Option<String>, Box<dyn std::error::Error>> {
-        if img_type == GuildImageType::Splash && self.splash.is_none() || img_type == GuildImageType::Banner && self.banner.is_none() {
+        if img_type == GuildImageType::Splash && self.splash.is_none() || img_type == GuildImageType::Banner && self.banner.is_none() || img_type == GuildImageType::Icon && self.icon.is_none() {
             return Ok(Some("None".to_string()));
         }
         let img_id = match img_type {
